@@ -1,31 +1,28 @@
 import cv2
 import mediapipe as mp
+import numpy as np
 
-def detect_faces_in_image(image_path):
-    # Initialize Mediapipe Face Detection
-    mp_face_detection = mp.solutions.face_detection
-    # Read the image
-    image = cv2.imread(image_path)
-    height, width, _ = image.shape
-    # Convert the image from BGR to RGB (Mediapipe uses RGB format)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    # Create a face detection object
-    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.5)
-    # Process the image
-    results = face_detection.process(image_rgb)
-    if results.detections:
+img = cv2.imread("faces10.jpg")
+faces = 0
+imgRGB = cv2.cvtColor(img , cv2.COLOR_BGR2RGB)
+print(imgRGB.shape)
+mpFACE = mp.solutions.face_detection
+face_detection = mpFACE.FaceDetection()
+results = face_detection.process(imgRGB)
+if results.detections:
         for detection in results.detections:
             bboxC = detection.location_data.relative_bounding_box
-            ih, iw, _ = image.shape
+            ih, iw, _ = img.shape
             x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), \
                          int(bboxC.width * iw), int(bboxC.height * ih)
-            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
-    # Display the output image
-    cv2.imshow('Face Detection', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+            cv2.rectangle( img, (x, y), (x+w, y+h), (0,255,0), 4)
+            faces = faces + 1
 
 
-if __name__ == "__main__":
-    image_path = 'cropped320.jpg'
-    detect_faces_in_image(image_path)
+string = str(faces)+'faces in image'
+cv2.putText(img, string ,(50,50),1,3,(0,0,255),4)
+# Display the output image
+print(faces)
+cv2.imshow('Face Detection', img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
